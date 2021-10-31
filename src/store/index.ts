@@ -24,8 +24,5 @@ export const store = createStore<State>({
     }
   },
   actions: {},
-  modules: {},
-  getters: {
-    getBoard: state => state.board
-  }
+  modules: {}
 });

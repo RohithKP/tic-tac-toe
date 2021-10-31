@@ -27,7 +27,8 @@
       text-green-900
     "
   >
-    {{ turn }}'s win!
+    <span v-if="hasWinner">{{ turn }}'s win!</span>
+    <span v-else>Draw!</span>
   </div>
 </template>
 <script lang="ts">
@@ -44,6 +45,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const isGameOver = ref(false);
+    const hasWinner = ref(false);
     const store = useStore(key); // store instead of `$store`
     const board = computed(() => store.state.board);
     const turn = computed(() => store.state.turn);
@@ -68,9 +70,15 @@ export default defineComponent({
 
       setCellState(i, turn.value);
 
-      if (!findWinningCombination()) {
+      const winningSequence = findWinningCombination();
+
+      if (!winningSequence) {
         nextTurn();
       } else {
+        hasWinner.value = true;
+      }
+
+      if (!board.value.includes(null) || winningSequence) {
         isGameOver.value = true;
       }
 
@@ -101,7 +109,6 @@ export default defineComponent({
           boardState[a] === boardState[b] &&
           boardState[a] === boardState[c]
         ) {
-          isGameOver.value = true;
           return combination;
         }
       }
@@ -113,7 +120,7 @@ export default defineComponent({
       return board.value.includes(null) && !isGameOver.value;
     }
 
-    return { board, onCellClick, turn, isGameOver };
+    return { board, onCellClick, turn, isGameOver, hasWinner };
   }
 });
 </script>
