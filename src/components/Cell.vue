@@ -5,16 +5,20 @@
       flex
       content-center
       items-center
+      justify-center
       cursor-pointer
-      border-4 border-solid border-indigo-400
+      border-4 border-solid border-gray-400
     "
     @click="cellClick"
   ></div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
+  // props: {
+  //   label: String as PropType<string>
+  // },
   setup() {},
   methods: {
     cellClick(event: MouseEvent) {

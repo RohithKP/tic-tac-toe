@@ -1,6 +1,8 @@
 <template>
   <header id="header" class="p-5">
-    <h1 class="text-2xl text-green-600">Tic.Tac.Toe</h1>
+    <h1 class="text-5xl mb-10 font-mono font-bold text-green-600">
+      Tic.Tac.Toe
+    </h1>
   </header>
   <router-view />
 </template>
