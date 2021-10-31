@@ -1,10 +1,16 @@
 <template>
-  <div class="grid justify-center items-center content-center grid-cols-3">
-    <Cell v-for="i in 9" :key="i"></Cell>
+  <div class="board grid justify-center items-center content-center">
+    <Cell
+      v-for="i in cells"
+      :key="i"
+      @cell-clicked="onCellClick(i, $event)"
+    ></Cell>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
+import { useStore } from "vuex";
+import { key } from "../store";
 import Cell from "./Cell.vue";
 
 export default defineComponent({
@@ -12,20 +18,34 @@ export default defineComponent({
   components: {
     Cell
   },
-  setup() {}
+  setup() {
+    const store = useStore(key); // store instead of `$store`
+    const cells = computed(() => store.state.board);
+    const turn = computed(() => store.state.turn);
+
+    function onCellClick(i: number, event: MouseEvent) {
+      console.log(i, event);
+      nextTurn();
+      console.log(store.state.turn);
+    }
+
+    function nextTurn() {
+      const nextTurnValue = turn.value === "X" ? "O" : "X";
+      store.commit("setTurn", nextTurnValue);
+    }
+
+    return { cells, onCellClick };
+  }
 });
 </script>
 
 <style scoped>
+.board {
+  grid-template-columns: repeat(3, auto);
+}
 .cell {
   width: var(--cell-size);
   height: var(--cell-size);
-  border: 1px solid black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
 }
 
 .cell:first-child,
