@@ -1,7 +1,7 @@
 <template>
-  <div class="home container mx-auto">
-    <section class="mb-10">
-      <Board />
+  <div class="home">
+    <section class="mb-10 relative">
+      <Board @board-status-changed="onBoardStatusChange($event)" />
     </section>
 
     <section class="flex justify-center mx-auto">
@@ -9,28 +9,53 @@
         <h2 class="pb-5">
           <span class="font-extrabold text-4xl text-blue-400">X</span>
         </h2>
-        <Timer ref="xTimer"></Timer>
+        <Timer ref="xTimer" label="xTimer"></Timer>
       </div>
       <div class="flex-1">
         <h2 class="pb-5">
           <span class="font-extrabold text-4xl text-red-500">O</span>
         </h2>
-        <Timer ref="oTimer"></Timer>
+        <Timer ref="oTimer" label="oTimer"></Timer>
       </div>
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { ComponentPublicInstance, defineComponent, ref } from "vue";
 import Board from "@/components/Board.vue";
 import Timer from "@/components/Timer.vue";
+import { IBoardStatusChangeEvent } from "../models/board";
 
 export default defineComponent({
   name: "Home",
   components: {
     Board,
     Timer
+  },
+  setup(props, {}) {
+    const xTimer = ref(null);
+    const oTimer = ref(null);
+    const onBoardStatusChange = function (event: IBoardStatusChangeEvent) {
+      const prevTimer: any =
+        event.currentTurn === "X" ? oTimer.value : xTimer.value;
+      const nextTimer: any =
+        event.currentTurn === "X" ? xTimer.value : oTimer.value;
+
+      if (event.isGameOver) {
+        nextTimer.stop();
+        prevTimer.stop();
+      } else {
+        nextTimer.start();
+        prevTimer.stop();
+      }
+    };
+
+    return {
+      onBoardStatusChange,
+      xTimer,
+      oTimer
+    };
   }
 });
 </script>
@@ -48,7 +73,6 @@ h2 > span::before {
   height: 8px;
   transform: skew(-12deg) translateX(-20%);
   background: rgb(0 0 0 / 10%);
-  /* background: linear-gradient(to right, #94f9f0 0%, #6ca8f3 100%); */
   z-index: -1;
 }
 </style>

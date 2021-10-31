@@ -7,7 +7,7 @@
       items-center
       justify-center
       cursor-pointer
-      border-4 border-solid border-gray-400
+      border-4 border-solid border-gray-300
     "
     @click="cellClick"
   ></div>

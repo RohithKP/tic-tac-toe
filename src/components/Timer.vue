@@ -1,34 +1,48 @@
 <template>
-  <div class="flex">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-    {{ time }}
+  <div class="flex text-2xl items-center justify-center">
+    <span class="pr-3">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </span>
+    <span class="text-gray-500">
+      {{ time }}
+    </span>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { Timer } from "../utils/helper";
 
 export default defineComponent({
-  setup() {
-    let time = ref("00: 00");
+  props: {
+    label: {
+      type: String as PropType<string>,
+      required: true
+    }
+  },
+  beforeUnmount() {
+    this.clear();
+  },
+
+  setup(props) {
+    let time = ref("00 : 00");
     const timer = new Timer(function (formattedTime: string) {
       time.value = formattedTime;
-    });
-    timer.start();
+    }, props.label);
+
     return {
       time,
       start: () => timer.start(),
@@ -38,3 +52,14 @@ export default defineComponent({
   }
 });
 </script>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

@@ -1,10 +1,12 @@
 <template>
-  <header id="header" class="p-5">
-    <h1 class="text-5xl mb-10 font-mono font-bold text-green-600">
-      Tic.Tac.Toe
-    </h1>
-  </header>
-  <router-view />
+  <div class="container mx-auto">
+    <header id="header" class="p-5">
+      <h1 class="text-5xl mb-10 font-mono font-bold text-green-600">
+        Tic.Tac.Toe
+      </h1>
+    </header>
+    <router-view />
+  </div>
 </template>
 
 <style lang="scss">

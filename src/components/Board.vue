@@ -10,6 +10,25 @@
       :class="board[index]"
     ></Cell>
   </div>
+  <div
+    v-if="isGameOver"
+    class="
+      winner-banner
+      text-7xl
+      absolute
+      bottom-0
+      left-0
+      right-0
+      top-0
+      flex
+      content-center
+      flex-col
+      justify-center
+      text-green-900
+    "
+  >
+    {{ turn }}'s win!
+  </div>
 </template>
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
@@ -19,19 +38,18 @@ import Cell from "./Cell.vue";
 
 export default defineComponent({
   name: "Board",
+  emits: ["board-status-changed"],
   components: {
     Cell
   },
-  setup() {
+  setup(props, { emit }) {
     const isGameOver = ref(false);
     const store = useStore(key); // store instead of `$store`
     const board = computed(() => store.state.board);
     const turn = computed(() => store.state.turn);
 
     function onCellClick(i: number, event: MouseEvent) {
-      console.log(i, event);
       makeMove(i);
-      console.log(store.state.turn);
     }
 
     function nextTurn() {
@@ -52,7 +70,14 @@ export default defineComponent({
 
       if (!findWinningCombination()) {
         nextTurn();
+      } else {
+        isGameOver.value = true;
       }
+
+      emit("board-status-changed", {
+        currentTurn: turn.value,
+        isGameOver: isGameOver.value
+      });
     }
 
     function findWinningCombination() {
@@ -96,6 +121,10 @@ export default defineComponent({
 <style scoped>
 .board {
   grid-template-columns: repeat(3, auto);
+  background: #e2e9dd42;
+}
+.winner-banner {
+  background: #95b5d19e;
 }
 .cell {
   width: var(--cell-size);
