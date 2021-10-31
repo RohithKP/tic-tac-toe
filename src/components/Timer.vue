@@ -4,6 +4,7 @@
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
+        :class="running ? 'animate-spin text-green-400' : ''"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -38,28 +39,26 @@ export default defineComponent({
   },
 
   setup(props) {
-    let time = ref("00 : 00");
+    const running = ref(false);
+    const time = ref("00 : 00");
     const timer = new Timer(function (formattedTime: string) {
       time.value = formattedTime;
     }, props.label);
 
     return {
+      running,
       time,
-      start: () => timer.start(),
-      stop: () => timer.stop(),
+      start: () => {
+        running.value = true;
+        timer.start();
+      },
+      stop: () => {
+        running.value = false;
+        timer.stop();
+      },
       clear: () => timer.clear()
     };
   }
 });
 </script>
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
+<style scoped></style>

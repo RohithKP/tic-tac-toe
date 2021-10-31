@@ -12,7 +12,7 @@ export class Timer {
 
   private startTimeCounter() {
     var now = Math.floor(Date.now() / 1000);
-    var diff = Math.max(now - this.startTime, 0);
+    var diff = Math.max(now - this.startTime, 1);
     this.pausedTimeDiff = diff;
     var m = Math.floor(diff / 60);
     var s = Math.floor(diff % 60);
@@ -27,9 +27,7 @@ export class Timer {
   }
 
   start() {
-    this.startTime = Math.floor(
-      Date.now() / 1000 - (this.pausedTimeDiff + 0.5)
-    );
+    this.startTime = Math.floor(Date.now() / 1000 - this.pausedTimeDiff);
     this.startTimeCounter();
   }
 
@@ -40,5 +38,6 @@ export class Timer {
 
   clear() {
     this.pausedTimeDiff = 0;
+    this.timerCallBack(`${this.padTime(0)} : ${this.padTime(0)}`);
   }
 }

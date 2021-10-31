@@ -4,34 +4,63 @@
     :class="isGameOver ? '' : turn"
   >
     <Cell
-      v-for="(i, index) in board"
-      :key="i"
+      v-for="(cellValue, index) in board"
+      :key="index"
       @cell-clicked="onCellClick(index, $event)"
-      :class="board[index]"
+      :class="[
+        board[index],
+        winningSequence?.includes(index) ? 'bg-green-100' : ''
+      ]"
     ></Cell>
   </div>
-  <div
-    v-if="isGameOver"
-    class="
-      winner-banner
-      text-7xl
-      absolute
-      bottom-0
-      left-0
-      right-0
-      top-0
-      flex
-      content-center
-      flex-col
-      justify-center
-      text-green-900
-    "
-  >
-    <span v-if="hasWinner">{{ turn }}'s win!</span>
-    <span v-else>Draw!</span>
-  </div>
+  <transition name="bounce">
+    <div
+      v-if="isGameOver"
+      class="
+        game-over-banner
+        text-7xl
+        absolute
+        bottom-0
+        left-0
+        right-0
+        top-0
+        flex
+        content-center
+        flex-col
+        justify-center
+        text-green-900
+      "
+    >
+      <div style="background: #ffffffa6">
+        <span v-if="winningSequence">{{ turn }}'s win!</span>
+        <span v-else>Draw!</span>
+      </div>
+      <span>
+        <button
+          class="bg-blue-700 p-2 rounded-full text-white animate-pulse"
+          @click="resetBoard()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+        </button>
+      </span>
+    </div>
+  </transition>
 </template>
 <script lang="ts">
+import { BoardEvent } from "@/models/board";
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { key } from "../store";
@@ -45,7 +74,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const isGameOver = ref(false);
-    const hasWinner = ref(false);
+    const winningSequence = ref<number[] | null>(null);
     const store = useStore(key); // store instead of `$store`
     const board = computed(() => store.state.board);
     const turn = computed(() => store.state.turn);
@@ -70,21 +99,20 @@ export default defineComponent({
 
       setCellState(i, turn.value);
 
-      const winningSequence = findWinningCombination();
+      winningSequence.value = findWinningCombination();
 
-      if (!winningSequence) {
+      if (!winningSequence.value) {
         nextTurn();
-      } else {
-        hasWinner.value = true;
       }
 
-      if (!board.value.includes(null) || winningSequence) {
+      if (!board.value.includes(null) || winningSequence.value) {
         isGameOver.value = true;
       }
 
       emit("board-status-changed", {
         currentTurn: turn.value,
-        isGameOver: isGameOver.value
+        isGameOver: isGameOver.value,
+        type: BoardEvent.cellClick
       });
     }
 
@@ -120,7 +148,26 @@ export default defineComponent({
       return board.value.includes(null) && !isGameOver.value;
     }
 
-    return { board, onCellClick, turn, isGameOver, hasWinner };
+    function resetBoard() {
+      store.commit("setTurn", "X");
+      store.commit("setBoard", new Array(9).fill(null));
+      isGameOver.value = false;
+      winningSequence.value = null;
+      emit("board-status-changed", {
+        currentTurn: turn.value,
+        isGameOver: true,
+        type: BoardEvent.reset
+      });
+    }
+
+    return {
+      board,
+      onCellClick,
+      turn,
+      isGameOver,
+      winningSequence,
+      resetBoard
+    };
   }
 });
 </script>
@@ -128,10 +175,10 @@ export default defineComponent({
 <style scoped>
 .board {
   grid-template-columns: repeat(3, auto);
-  background: #e2e9dd42;
+  /* background: #e2e9dd42; */
 }
-.winner-banner {
-  background: #95b5d19e;
+.game-over-banner {
+  text-shadow: -5px 3px 3px #e4ffe2;
 }
 .cell {
   width: var(--cell-size);
@@ -219,5 +266,24 @@ export default defineComponent({
   width: calc(var(--mark-size) * 0.7);
   height: calc(var(--mark-size) * 0.7);
   background-color: white;
+}
+
+/* animation */
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

@@ -21,6 +21,9 @@ export const store = createStore<State>({
     },
     setCell(state, payload: { index: number; turn: string }) {
       state.board[payload.index] = payload.turn;
+    },
+    setBoard(state, payload: State["board"]) {
+      state.board = payload;
     }
   },
   actions: {},
