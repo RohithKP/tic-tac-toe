@@ -3,9 +3,13 @@ import Home from "../views/Home.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/tic-tac-toe",
     name: "Home",
     component: Home
+  },
+  {
+    path: "/",
+    redirect: "/tic-tac-toe"
   }
   // {
   //   path: '/about',

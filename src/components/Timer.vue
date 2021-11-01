@@ -17,7 +17,7 @@
         />
       </svg>
     </span>
-    <span class="text-gray-500">
+    <span :class="running ? 'text-green-400' : 'text-gray-500'">
       {{ time }}
     </span>
   </div>

@@ -1,7 +1,7 @@
 <template>
   <div
     class="board grid justify-center items-center content-center"
-    :class="isGameOver ? '' : turn"
+    :class="progress === 0 ? '' : turn"
   >
     <Cell
       v-for="(cellValue, index) in board"
@@ -14,53 +14,82 @@
     ></Cell>
   </div>
   <transition name="bounce">
-    <div
-      v-if="isGameOver"
-      class="
-        game-over-banner
-        text-7xl
-        absolute
-        bottom-0
-        left-0
-        right-0
-        top-0
-        flex
-        content-center
-        flex-col
-        justify-center
-        text-green-900
-      "
-    >
-      <div style="background: #ffffffa6">
-        <span v-if="winningSequence">{{ turn }}'s win!</span>
-        <span v-else>Draw!</span>
+    <div>
+      <div
+        v-if="progress === 0"
+        class="
+          game-over-banner
+          text-7xl
+          absolute
+          bottom-0
+          left-0
+          right-0
+          top-0
+          flex
+          content-center
+          flex-col
+          justify-center
+          items-center
+          text-green-900
+        "
+      >
+        <template v-if="!isBoardEmpty">
+          <div style="background: #ffffffa6" class="w-full">
+            <span v-if="winningSequence">{{ turn }}'s win!</span>
+            <span v-else>Draw!</span>
+            <div>
+              <button
+                class="bg-blue-700 p-2 rounded-full text-white animate-pulse"
+                @click.stop="resetBoard()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <button @click.stop="startGame" v-if="progress === 0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 transform scale-150 text-purple-500 scale-450"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+        </template>
       </div>
-      <span>
-        <button
-          class="bg-blue-700 p-2 rounded-full text-white animate-pulse"
-          @click="resetBoard()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-        </button>
-      </span>
     </div>
   </transition>
 </template>
 <script lang="ts">
-import { BoardEvent } from "@/models/board";
+import { BoardEvent, GameStatus } from "@/models/board";
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { key } from "../store";
@@ -73,11 +102,12 @@ export default defineComponent({
     Cell
   },
   setup(props, { emit }) {
-    const isGameOver = ref(false);
     const winningSequence = ref<number[] | null>(null);
     const store = useStore(key); // store instead of `$store`
     const board = computed(() => store.state.board);
     const turn = computed(() => store.state.turn);
+    const progress = computed(() => store.state.progress);
+    const isBoardEmpty = computed(() => !store.state.board.some(val => !!val));
 
     function onCellClick(i: number, event: MouseEvent) {
       makeMove(i);
@@ -106,13 +136,13 @@ export default defineComponent({
       }
 
       if (!board.value.includes(null) || winningSequence.value) {
-        isGameOver.value = true;
+        store.commit("setProgress", GameStatus.Idle);
       }
 
       emit("board-status-changed", {
         currentTurn: turn.value,
-        isGameOver: isGameOver.value,
-        type: BoardEvent.cellClick
+        progress: progress.value,
+        type: BoardEvent.CellClick
       });
     }
 
@@ -145,28 +175,36 @@ export default defineComponent({
     }
 
     function isInProgress() {
-      return board.value.includes(null) && !isGameOver.value;
+      return board.value.includes(null) && progress.value;
     }
 
     function resetBoard() {
+      store.commit("setProgress", GameStatus.InProgress);
       store.commit("setTurn", "X");
       store.commit("setBoard", new Array(9).fill(null));
-      isGameOver.value = false;
+
       winningSequence.value = null;
+
       emit("board-status-changed", {
         currentTurn: turn.value,
-        isGameOver: true,
-        type: BoardEvent.reset
+        progress: progress.value,
+        type: BoardEvent.Reset
       });
+    }
+
+    function startGame() {
+      resetBoard();
     }
 
     return {
       board,
       onCellClick,
       turn,
-      isGameOver,
       winningSequence,
-      resetBoard
+      resetBoard,
+      progress,
+      startGame,
+      isBoardEmpty
     };
   }
 });
@@ -285,5 +323,10 @@ export default defineComponent({
   100% {
     transform: scale(1);
   }
+}
+
+.scale-450 {
+  --tw-scale-x: 4.5;
+  --tw-scale-y: 4.5;
 }
 </style>

@@ -20,10 +20,21 @@
 </template>
 
 <script lang="ts">
-import { ComponentPublicInstance, defineComponent, ref } from "vue";
+import {
+  ComponentPublicInstance,
+  defineComponent,
+  onMounted,
+  Ref,
+  ref
+} from "vue";
 import Board from "@/components/Board.vue";
 import Timer from "@/components/Timer.vue";
-import { BoardEvent, IBoardStatusChangeEvent } from "../models/board";
+import {
+  BoardEvent,
+  GameStatus,
+  IBoardStatusChangeEvent,
+  ITimer
+} from "../models/board";
 
 export default defineComponent({
   name: "Home",
@@ -32,21 +43,26 @@ export default defineComponent({
     Timer
   },
   setup(props, {}) {
-    const xTimer = ref(null);
-    const oTimer = ref(null);
+    const xTimer: any = ref(null);
+    const oTimer: any = ref(null);
+
+    // onMounted(() => {
+    //   xTimer.value!.start();
+    // });
+
     const onBoardStatusChange = function (event: IBoardStatusChangeEvent) {
       // TODO - types
-      const prevTimer: any =
+      const prevTimer: ITimer =
         event.currentTurn === "X" ? oTimer.value : xTimer.value;
-      const nextTimer: any =
+      const nextTimer: ITimer =
         event.currentTurn === "X" ? xTimer.value : oTimer.value;
 
-      if (event.type === BoardEvent.reset) {
+      if (event.type === BoardEvent.Reset) {
         prevTimer.clear();
         nextTimer.clear();
       }
 
-      if (event.isGameOver) {
+      if (event.progress == GameStatus.Idle) {
         nextTimer.stop();
         prevTimer.stop();
       } else {
