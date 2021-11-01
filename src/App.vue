@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <header class="p-5 header">
-      <h1 class="text-5xl font-mono font-bold text-blue-500 inline underline">
+      <h1 class="text-5xl font-mono font-bold text-indigo-400 inline underline">
         Tic.Tac.Toe
       </h1>
     </header>
