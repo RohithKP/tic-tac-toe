@@ -15,6 +15,10 @@ app.use(
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/api/test", (req, res) => {
+  res.json("test success");
+});
+
 app.get("/", function (req, res) {
   res.sendFile(path + "index.html");
 });

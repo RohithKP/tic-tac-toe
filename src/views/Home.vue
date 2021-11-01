@@ -20,13 +20,7 @@
 </template>
 
 <script lang="ts">
-import {
-  ComponentPublicInstance,
-  defineComponent,
-  onMounted,
-  Ref,
-  ref
-} from "vue";
+import { defineComponent, ref } from "vue";
 import Board from "@/components/Board.vue";
 import Timer from "@/components/Timer.vue";
 import {
@@ -35,6 +29,7 @@ import {
   IBoardStatusChangeEvent,
   ITimer
 } from "../models/board";
+import { testExpressServer } from "../services/testService";
 
 export default defineComponent({
   name: "Home",
@@ -42,13 +37,9 @@ export default defineComponent({
     Board,
     Timer
   },
-  setup(props, {}) {
+  setup() {
     const xTimer: any = ref(null);
     const oTimer: any = ref(null);
-
-    // onMounted(() => {
-    //   xTimer.value!.start();
-    // });
 
     const onBoardStatusChange = function (event: IBoardStatusChangeEvent) {
       // TODO - types
@@ -70,6 +61,8 @@ export default defineComponent({
         prevTimer.stop();
       }
     };
+
+    testExpressServer().then(data => console.log(data)); //for testing api end point
 
     return {
       onBoardStatusChange,
@@ -96,3 +89,6 @@ h2 > span::before {
   z-index: -1;
 }
 </style>
+
+function created(arg0: () => void) { throw new Error("Function not
+implemented."); }
