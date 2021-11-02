@@ -1,11 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const path = require("path");
 const port = 8000;
-const path = require("path").resolve("../dist");
 
-app.use(express.static(path));
+app.use(express.static(path.join(__dirname, "../dist")));
+
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -20,7 +20,7 @@ app.get("/api/test", (req, res) => {
 });
 
 app.get("/", function (req, res) {
-  res.sendFile(path + "index.html");
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 // listen on the port
