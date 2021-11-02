@@ -85,10 +85,10 @@ h2 > span::before {
   content: "";
   position: absolute;
   bottom: 0;
-  width: 160%;
-  height: 8px;
+  width: 190%;
+  height: 6px;
   transform: skew(-12deg) translateX(-20%);
-  background: rgb(0 0 0 / 10%);
+  background: rgb(0 0 0 / 21%);
   z-index: -1;
 }
 </style>

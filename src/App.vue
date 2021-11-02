@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <header class="p-5 header">
-      <h1 class="text-5xl font-mono font-bold text-indigo-400 inline underline">
+      <h1 class="font-bold font-mono inline text-5xl text-gray-600 underline">
         Tic.Tac.Toe
       </h1>
     </header>
@@ -16,11 +16,5 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.header {
-  text-shadow: -5px 3px 3px #f9cece;
-  h1 {
-    // border-bottom: 3px double;
-  }
 }
 </style>
