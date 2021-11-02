@@ -90,10 +90,13 @@
 </template>
 <script lang="ts">
 import { BoardEvent, GameStatus } from "@/models/board";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { key } from "../store";
 import Cell from "./Cell.vue";
+const bounceSound = require("@/assets/audio/bounce.mp3");
+const xSound = require("@/assets/audio/xSound.wav");
+const oSound = require("@/assets/audio/oSound.wav");
 
 export default defineComponent({
   name: "Board",
@@ -108,6 +111,11 @@ export default defineComponent({
     const turn = computed(() => store.state.turn);
     const progress = computed(() => store.state.progress);
     const isBoardEmpty = computed(() => !store.state.board.some(val => !!val));
+    watch(progress, (current, prev) => {
+      if (current === GameStatus.Idle) {
+        new Audio(bounceSound).play();
+      }
+    });
 
     function onCellClick(i: number, event: MouseEvent) {
       makeMove(i);
@@ -126,6 +134,8 @@ export default defineComponent({
       if (!isInProgress() || board.value[i]) {
         return;
       }
+
+      new Audio(turn.value === "X" ? xSound : oSound).play();
 
       setCellState(i, turn.value);
 
