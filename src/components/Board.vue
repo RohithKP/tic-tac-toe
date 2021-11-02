@@ -95,6 +95,7 @@ import { useStore } from "vuex";
 import { key } from "../store";
 import Cell from "./Cell.vue";
 const bounceSound = require("@/assets/audio/bounce.mp3");
+const playSound = require("@/assets/audio/play.mp3");
 const xSound = require("@/assets/audio/xSound.wav");
 const oSound = require("@/assets/audio/oSound.wav");
 
@@ -113,7 +114,7 @@ export default defineComponent({
     const isBoardEmpty = computed(() => !store.state.board.some(val => !!val));
     watch(progress, (current, prev) => {
       if (current === GameStatus.Idle) {
-        new Audio(bounceSound).play();
+        playAudio(bounceSound);
       }
     });
 
@@ -135,7 +136,7 @@ export default defineComponent({
         return;
       }
 
-      new Audio(turn.value === "X" ? xSound : oSound).play();
+      playAudio(turn.value === "X" ? xSound : oSound);
 
       setCellState(i, turn.value);
 
@@ -203,7 +204,14 @@ export default defineComponent({
     }
 
     function startGame() {
-      resetBoard();
+      playAudio(playSound);
+      setTimeout(() => {
+        resetBoard();
+      });
+    }
+
+    function playAudio(sound: any) {
+      new Audio(sound).play();
     }
 
     return {

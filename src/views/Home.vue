@@ -17,12 +17,14 @@
       <Timer ref="oTimer" label="oTimer"></Timer>
     </div>
   </section>
+  <!-- <Analytics></Analytics> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Board from "@/components/Board.vue";
 import Timer from "@/components/Timer.vue";
+// import Analytics from "@/components/Analytics.vue";
 import {
   BoardEvent,
   GameStatus,
@@ -36,6 +38,7 @@ export default defineComponent({
   components: {
     Board,
     Timer
+    // Analytics
   },
   setup() {
     const xTimer: any = ref(null);

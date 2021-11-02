@@ -11,11 +11,11 @@ export class Timer {
   }
 
   private startTimeCounter() {
-    var now = Math.floor(Date.now() / 1000);
-    var diff = Math.max(now - this.startTime, 1);
+    const now = Math.floor(Date.now() / 1000);
+    const diff = Math.max(now - this.startTime, 1);
     this.pausedTimeDiff = diff;
-    var m = Math.floor(diff / 60);
-    var s = Math.floor(diff % 60);
+    const m = Math.floor(diff / 60);
+    const s = Math.floor(diff % 60);
     clearTimeout(this.timer);
     this.timer = setTimeout(this.startTimeCounter.bind(this), 500);
     this.timerCallBack(`${this.padTime(m)} : ${this.padTime(s)}`);
