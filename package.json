@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest dist"
+    "build": "vue-cli-service build --dest dist",
+    "start": "cross-env NODE_ENV=production node server/server.js"
   },
   "dependencies": {
     "apexcharts": "^3.29.0",
     "core-js": "^3.6.5",
+    "cross-env": "^7.0.3",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
     "vue-apexcharts": "^1.6.2",

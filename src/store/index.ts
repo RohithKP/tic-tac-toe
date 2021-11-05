@@ -41,6 +41,10 @@ export const store = createStore<State>({
       { turn, interval }: { turn: string; interval: number }
     ) {
       state.moveIntervals[turn.toLowerCase()].push(interval);
+    },
+    resetIntervals(state) {
+      state.moveIntervals.x.length = 0;
+      state.moveIntervals.o.length = 0;
     }
   },
   actions: {},

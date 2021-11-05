@@ -125,8 +125,6 @@ export default defineComponent({
     watch(progress, (current, prev) => {
       if (current === GameStatus.Idle) {
         playAudio(bounceSound);
-      } else {
-        t1 = performance.now();
       }
     });
 
@@ -213,6 +211,7 @@ export default defineComponent({
       store.commit("setProgress", GameStatus.InProgress);
       store.commit("setTurn", "X");
       store.commit("setBoard", new Array(9).fill(null));
+      store.commit("resetIntervals");
 
       winningSequence.value = null;
 
@@ -227,6 +226,7 @@ export default defineComponent({
       playAudio(playSound);
       setTimeout(() => {
         resetBoard();
+        t1 = performance.now();
       });
     }
 

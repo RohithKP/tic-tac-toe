@@ -87,16 +87,13 @@ export default defineComponent({
       xaxis: {
         categories: new Array(steps.value).fill(0).map((n, i) => `${i + 1}`),
         title: {
-          text: "Time"
+          text: "Time In Seconds"
         }
       },
       yaxis: {
         title: {
           text: "Step"
         }
-        // labels: {
-        //   show: false
-        // }
       }
     }));
 
