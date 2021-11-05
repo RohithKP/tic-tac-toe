@@ -5,7 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest dist",
-    "start": "cross-env NODE_ENV=production node server/server.js"
+    "start": "cross-env NODE_ENV=production node server/server.js",
+    "postinstall": "cd server && npm install",
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "apexcharts": "^3.29.0",
