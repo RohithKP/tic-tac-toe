@@ -32,6 +32,10 @@ export default defineComponent({
     label: {
       type: String as PropType<string>,
       required: true
+    },
+    timeoutInMins: {
+      type: Number as PropType<number>,
+      default: Infinity
     }
   },
   beforeUnmount() {
@@ -41,9 +45,9 @@ export default defineComponent({
   setup(props) {
     const running = ref(false);
     const time = ref("00 : 00");
-    const timer = new Timer(function (formattedTime: string) {
+    const timer = new Timer(props.label, function (formattedTime: string) {
       time.value = formattedTime;
-    }, props.label);
+    });
 
     return {
       running,
@@ -52,9 +56,10 @@ export default defineComponent({
         running.value = true;
         timer.start();
       },
+
       stop: () => {
         running.value = false;
-        timer.stop();
+        return timer.stop();
       },
       clear: () => timer.clear()
     };

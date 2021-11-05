@@ -40,7 +40,7 @@ export const store = createStore<State>({
       state,
       { turn, interval }: { turn: string; interval: number }
     ) {
-      state.moveIntervals[turn.toLowerCase()].push(interval);
+      state.moveIntervals[turn.toLowerCase()].push(+interval.toFixed(3));
     },
     resetIntervals(state) {
       state.moveIntervals.x.length = 0;

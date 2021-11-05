@@ -1,6 +1,9 @@
 <template>
   <section class="my-10 relative">
-    <Board @boardStatusChanged="onBoardStatusChange($event)" />
+    <Board
+      @boardStatusChanged="onBoardStatusChange($event)"
+      timeoutInMins="2"
+    />
   </section>
 
   <div class="mx-auto game-detail-wrapper">
@@ -15,11 +18,11 @@
         <h2 class="pb-5">
           <span class="font-extrabold font-mono text-5xl text-red-500">O</span>
         </h2>
-        <Timer ref="oTimer" label="oTimer"></Timer>
+        <Timer ref="oTimer" label="oTimer" :timeoutInMins="1"></Timer>
       </div>
     </section>
     <section>
-      <Chart :series="seriesData"></Chart>
+      <Chart :series="seriesData" :timeoutInMins="1"></Chart>
     </section>
   </div>
 
@@ -59,21 +62,30 @@ export default defineComponent({
     const onBoardStatusChange = function (event: IBoardStatusChangeEvent) {
       // TODO - types
       const prevTimer: ITimer =
-        event.currentTurn === "X" ? oTimer.value : xTimer.value;
+        event.prevTurn === "X" ? xTimer.value : oTimer.value;
       const nextTimer: ITimer =
         event.currentTurn === "X" ? xTimer.value : oTimer.value;
-
       if (event.type === BoardEvent.Reset) {
         prevTimer.clear();
         nextTimer.clear();
       }
-
+      let interval = 0;
       if (event.progress == GameStatus.Idle) {
-        nextTimer.stop();
+        interval = nextTimer.stop();
         prevTimer.stop();
       } else {
         nextTimer.start();
-        prevTimer.stop();
+        interval = prevTimer.stop();
+      }
+      if (interval > 60) {
+        // TODO
+        console.log("Timeout");
+      }
+      if (event.prevTurn) {
+        store.commit("setIntervals", {
+          turn: event.prevTurn,
+          interval
+        });
       }
     };
 

@@ -94,7 +94,7 @@ import {
   GameStatus,
   IBoardStatusChangeEvent
 } from "@/models/common";
-import { computed, defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, PropType, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { key } from "../store";
 import Cell from "./Cell.vue";
@@ -105,6 +105,12 @@ const oSound = require("@/assets/audio/oSound.wav");
 
 export default defineComponent({
   name: "Board",
+  props: {
+    timeoutInMins: {
+      type: Number as PropType<number>,
+      default: Infinity
+    }
+  },
   emits: {
     boardStatusChanged(payload: IBoardStatusChangeEvent) {
       return true;
@@ -135,13 +141,14 @@ export default defineComponent({
     function nextTurn() {
       const nextTurnValue = turn.value === "X" ? "O" : "X";
       store.commit("setTurn", nextTurnValue);
-      t1 = performance.now();
+      // t1 = performance.now();
     }
 
-    function updateIntervals(t2: number, t1: number) {
-      const interval = +((t2 - t1) / 1000).toFixed(3);
-      store.commit("setIntervals", { turn: turn.value, interval });
-    }
+    // function updateIntervals(t2: number, t1: number) {
+    //   t2 = performance.now();
+    //   const interval = +((t2 - t1) / 1000).toFixed(3);
+    //   store.commit("setIntervals", { turn: turn.value, interval });
+    // }
     function setCellState(index: number, turn: string) {
       store.commit("setCell", { index, turn });
     }
@@ -151,11 +158,11 @@ export default defineComponent({
         return;
       }
 
-      t2 = performance.now();
-      updateIntervals(t2, t1);
+      // updateIntervals(t2, t1);
 
       playAudio(turn.value === "X" ? xSound : oSound);
 
+      let prevTurn = turn.value;
       setCellState(i, turn.value);
 
       winningSequence.value = findWinningCombination();
@@ -169,6 +176,7 @@ export default defineComponent({
       }
 
       emit("boardStatusChanged", {
+        prevTurn: prevTurn,
         currentTurn: turn.value,
         progress: progress.value,
         type: BoardEvent.CellClick
@@ -216,17 +224,18 @@ export default defineComponent({
       winningSequence.value = null;
 
       emit("boardStatusChanged", {
+        prevTurn: "",
         currentTurn: turn.value,
         progress: progress.value,
         type: BoardEvent.Reset
       });
+      // t1 = performance.now();
     }
 
     function startGame() {
       playAudio(playSound);
       setTimeout(() => {
         resetBoard();
-        t1 = performance.now();
       });
     }
 
