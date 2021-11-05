@@ -1,12 +1,13 @@
 import { createStore, Store } from "vuex";
 import { InjectionKey } from "vue";
-import { GameStatus } from "@/models/board";
+import { GameStatus, IStringArrayMap } from "@/models/common";
 
 // define your typings for the store state
 export interface State {
   turn: string;
   board: Array<string | null>;
   progress: GameStatus;
+  moveIntervals: IStringArrayMap;
 }
 
 // define injection key
@@ -16,22 +17,36 @@ export const store = createStore<State>({
   state: {
     turn: "X",
     board: new Array(9).fill(null),
-    progress: GameStatus.Idle
+    progress: GameStatus.Idle,
+    moveIntervals: {
+      x: [],
+      o: []
+    }
   },
   mutations: {
-    setTurn(state, payload) {
+    setTurn(state, payload: string) {
       state.turn = payload;
     },
-    setCell(state, payload: { index: number; turn: string }) {
-      state.board[payload.index] = payload.turn;
+    setCell(state, { index, turn }: { index: number; turn: string }) {
+      state.board[index] = turn;
     },
     setBoard(state, payload: State["board"]) {
       state.board = payload;
     },
     setProgress(state, payload: GameStatus) {
       state.progress = payload;
+    },
+    setIntervals(
+      state,
+      { turn, interval }: { turn: string; interval: number }
+    ) {
+      state.moveIntervals[turn.toLowerCase()].push(interval);
     }
   },
   actions: {},
-  modules: {}
+  modules: {},
+  getters: {
+    xIntervals: state => state.moveIntervals["x"] || [],
+    oIntervals: state => state.moveIntervals["o"] || []
+  }
 });

@@ -89,7 +89,11 @@
   </transition>
 </template>
 <script lang="ts">
-import { BoardEvent, GameStatus } from "@/models/board";
+import {
+  BoardEvent,
+  GameStatus,
+  IBoardStatusChangeEvent
+} from "@/models/common";
 import { computed, defineComponent, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { key } from "../store";
@@ -101,13 +105,19 @@ const oSound = require("@/assets/audio/oSound.wav");
 
 export default defineComponent({
   name: "Board",
-  emits: ["board-status-changed"],
+  emits: {
+    boardStatusChanged(payload: IBoardStatusChangeEvent) {
+      return true;
+    }
+  },
   components: {
     Cell
   },
   setup(props, { emit }) {
+    let t1 = 0;
+    let t2 = 0;
     const winningSequence = ref<number[] | null>(null);
-    const store = useStore(key); // store instead of `$store`
+    const store = useStore(key);
     const board = computed(() => store.state.board);
     const turn = computed(() => store.state.turn);
     const progress = computed(() => store.state.progress);
@@ -115,6 +125,8 @@ export default defineComponent({
     watch(progress, (current, prev) => {
       if (current === GameStatus.Idle) {
         playAudio(bounceSound);
+      } else {
+        t1 = performance.now();
       }
     });
 
@@ -125,8 +137,13 @@ export default defineComponent({
     function nextTurn() {
       const nextTurnValue = turn.value === "X" ? "O" : "X";
       store.commit("setTurn", nextTurnValue);
+      t1 = performance.now();
     }
 
+    function updateIntervals(t2: number, t1: number) {
+      const interval = +((t2 - t1) / 1000).toFixed(3);
+      store.commit("setIntervals", { turn: turn.value, interval });
+    }
     function setCellState(index: number, turn: string) {
       store.commit("setCell", { index, turn });
     }
@@ -135,6 +152,9 @@ export default defineComponent({
       if (!isInProgress() || board.value[i]) {
         return;
       }
+
+      t2 = performance.now();
+      updateIntervals(t2, t1);
 
       playAudio(turn.value === "X" ? xSound : oSound);
 
@@ -150,7 +170,7 @@ export default defineComponent({
         store.commit("setProgress", GameStatus.Idle);
       }
 
-      emit("board-status-changed", {
+      emit("boardStatusChanged", {
         currentTurn: turn.value,
         progress: progress.value,
         type: BoardEvent.CellClick
@@ -196,7 +216,7 @@ export default defineComponent({
 
       winningSequence.value = null;
 
-      emit("board-status-changed", {
+      emit("boardStatusChanged", {
         currentTurn: turn.value,
         progress: progress.value,
         type: BoardEvent.Reset

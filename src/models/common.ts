@@ -23,3 +23,7 @@ export enum GameStatus {
   Idle,
   InProgress
 }
+
+export interface IStringArrayMap {
+  [key: string]: Array<number>;
+}
